@@ -1,0 +1,65 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v3.2.0
+    hooks:
+      - id: trailing-whitespace # 检查文件末尾是否包含多余的空格或制表符
+      - id: end-of-file-fixer # 自动修复文件末尾缺少的换行符
+      - id: check-yaml # 检查 YAML 文件的语法和格式
+      - id: check-added-large-files # 检查是否添加的大文件的
+      # 自己添加的
+      - id: check-byte-order-marker # 检查文件是否包含字节顺序标记（BOM）
+      - id: check-case-conflict # 检查文件名的大小写是否与版本控制系统中的文件名大小写冲突。
+      - id: check-merge-conflict # 检查是否存在未解决的合并冲突。
+      - id: check-symlinks # 检查是否存在指向不存在文件的符号链接
+      - id: mixed-line-ending # 检查文件是否包含混合的换行符（如同时包含 Windows 和 Unix 风格的换行符）
+  - repo: https://github.com/psf/black
+    rev: 22.10.0
+    hooks:
+      - id: black # 使用 22.10.0版本的black工具对python进行格式化
+  - repo: local
+    hooks:
+      - id: cargo-fmt
+        name: cargo fmt
+        description: Format files with rustfmt.
+        entry: bash -c 'cargo fmt -- --check'
+        language: rust
+        # 执行的条件：存在.rs文件
+        files: \.rs$
+        args: [ ]
+      - id: cargo-deny
+        name: cargo deny check
+        description: Check cargo dependencies
+        entry: bash -c 'cargo deny check -d'
+        language: rust
+        files: \.rs$
+        args: [ ]
+      - id: typos
+        name: typos
+        description: check typo
+        entry: bash -c 'typos'
+        language: rust
+        files: \.*$
+        pass_filenames: false
+      - id: cargo-check
+        name: cargo check
+        description: Check the package for errors.
+        entry: bash -c 'cargo check --all'
+        language: rust
+        files: \.rs$
+        pass_filenames: false
+      - id: cargo-clippy
+        name: cargo clippy
+        description: Lint rust sources
+        entry: bash -c 'cargo clippy --all-targets --all-features --tests --benches -- -D warnings'
+        language: rust
+        files: \.rs$
+        pass_filenames: false
+      - id: cargo-test
+        name: cargo test
+        description: unit test for the project
+        entry: bash -c 'cargo nextest run --all-features'
+        language: rust
+        files: \.rs$
+        pass_filenames: false
